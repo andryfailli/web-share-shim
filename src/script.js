@@ -12,6 +12,10 @@ navigator.share = navigator.share || (function(){
     	whatsapp: payload => (isDesktop ? 'https://api.whatsapp.com/send?text=' : 'whatsapp://send?text=') + payload,
     	telegram: payload => (isDesktop ? 'https://telegram.me/share/msg?url='+location.host+'&text=' : 'tg://msg?text=') + payload,
     	facebook: (payload, fbid, url) => !fbid ? "" : 'https://www.facebook.com/dialog/share?app_id='+fbid+'&display=popup&href='+url+'&redirect_uri='+encodeURIComponent(location.href)+'&quote=' + payload,
+		messenger: (payload, fbid, url) => !fbid ? "" : (isDesktop ? 'https://www.facebook.com/dialog/send?app_id='+fbid+'&display=popup&link='+url+'&redirect_uri='+encodeURIComponent(location.href)+'&quote=' : 'fb-messenger://share/?message=') + payload,
+		linkedin: url => 'https://www.linkedin.com/shareArticle?mini=true&url='+url,
+		twitter:  payload => 'https://twitter.com/intent/tweet?text=' + payload,
+    	pinterest:    (payload, url) => 'http://pinterest.com/pin/create/button/?url='+url+'&description='+payload,
     	email:    (payload, title) => 'mailto:?subject='+title+'&body='+payload,
         sms:      payload => android ? 'sms:?body='+payload : 'sms:&body='+payload
 	};
@@ -27,14 +31,18 @@ navigator.share = navigator.share || (function(){
             return templatePromise.then(template => {
                 const el = document.createElement('div');
                 el.innerHTML = template;
-
-                this.$root     = el.querySelector('.web-share');
-                this.$whatsapp = el.querySelector('.web-share-whatsapp');
-                this.$facebook = el.querySelector('.web-share-facebook');
-                this.$telegram = el.querySelector('.web-share-telegram');
-                this.$email    = el.querySelector('.web-share-email');
-                this.$sms      = el.querySelector('.web-share-sms');
-                this.$copy     = el.querySelector('.web-share-copy');
+                                
+                this.$root      = el.querySelector('.web-share');
+                this.$whatsapp  = el.querySelector('.web-share-whatsapp');
+                this.$facebook  = el.querySelector('.web-share-facebook');
+                this.$messenger = el.querySelector('.web-share-messenger');
+                this.$telegram  = el.querySelector('.web-share-telegram');
+                this.$linkedin  = el.querySelector('.web-share-linkedin');
+                this.$twitter   = el.querySelector('.web-share-twitter');
+                this.$pinterest = el.querySelector('.web-share-pinterest');
+                this.$email     = el.querySelector('.web-share-email');
+                this.$sms       = el.querySelector('.web-share-sms');
+                this.$copy      = el.querySelector('.web-share-copy');
                 this.$copy.onclick = () => this._copy();
                 this.$root.onclick = () => this._hide();
                 this.$root.classList.toggle('desktop', isDesktop);
@@ -52,7 +60,11 @@ navigator.share = navigator.share || (function(){
 			title = encodeURIComponent(title);
 	    	this.$whatsapp.href = shareUrls.whatsapp(payload);
 	    	this.$facebook.href = shareUrls.facebook(payload, facebookId, payloadObj.url);
+	    	this.$messenger.href = shareUrls.messenger(payload, facebookId, payloadObj.url);
 	    	this.$telegram.href = shareUrls.telegram(payload);
+	    	this.$linkedin.href = shareUrls.linkedin(payloadObj.url);
+	    	this.$twitter.href = shareUrls.twitter(payload);
+	    	this.$pinterest.href = shareUrls.pinterest(payload, payloadObj.url);
 	    	this.$email.href = shareUrls.email(payload, title);
 	    	this.$sms.href = shareUrls.sms(payload);
 		}
